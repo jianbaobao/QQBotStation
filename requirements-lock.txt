@@ -1,0 +1,13 @@
+# QQBotStation 依赖锁定版本 (2026-07)
+# 用于可复现的安装
+PySide6==6.8.3
+playwright==1.52.0
+pyautogui==0.9.54
+pywin32==308; platform_system == "Windows"
+keyboard==0.13.5
+APScheduler==3.11.0
+Pillow==11.2.1
+numpy==2.2.5
+opencv-python-headless==4.11.0
+psutil==7.0.0
+requests==2.32.3

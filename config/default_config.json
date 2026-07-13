@@ -1,0 +1,41 @@
+# QQBotStation 配置文件
+# 自动生成 - 应用首次启动时会创建
+
+{
+    "general": {
+        "start_minimized": false,
+        "auto_start": false,
+        "enable_tray": true,
+        "language": "zh-CN"
+    },
+    "task_defaults": {
+        "check_interval_minutes": 60,
+        "retry_count": 3,
+        "max_concurrent": 3
+    },
+    "qq": {
+        "path": "",
+        "typing_speed": "normal",
+        "inter_group_delay_seconds": 5,
+        "enable_ocr_search": true,
+        "max_groups_per_batch": 20,
+        "enabled": true
+    },
+    "web": {
+        "headless": false,
+        "language": "zh-CN",
+        "page_load_timeout_seconds": 30,
+        "screenshot_before_checkin": false,
+        "screenshot_after_checkin": true,
+        "data_dir": "data/browser_data"
+    },
+    "ocr": {
+        "use_gpu": false,
+        "language": "ch",
+        "default_delay_seconds": 1
+    },
+    "scheduler": {
+        "enabled": true,
+        "web_port": 8580
+    }
+}

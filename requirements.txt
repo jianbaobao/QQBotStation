@@ -1,0 +1,76 @@
+# QQBotStation 运行库清单
+# ========================
+# 安装: pip install -r requirements.txt && playwright install chromium
+# 快速安装(无OCR): pip install PySide6 playwright pyautogui pywin32 keyboard APScheduler Pillow numpy requests psutil opencv-python-headless && playwright install chromium
+#
+# Windows GUI:  python main.py
+# Linux/Docker: python main.py --daemon
+
+# ==================== GUI框架（必需） ====================
+PySide6>=6.5.0
+# Qt GUI框架 - 桌面应用界面
+
+# ==================== 浏览器自动化（必需） ====================
+playwright>=1.40.0
+# 浏览器自动化引擎 - 网站签到操作
+# 安装后还需: playwright install chromium
+
+# ==================== 桌面自动化（必需, Windows） ====================
+pyautogui>=0.9.54
+# 鼠标键盘模拟 - QQ客户端操作、人机模拟
+
+pywin32>=305; platform_system == "Windows"
+# Windows API - 窗口查找/操作、截图
+
+keyboard>=0.13.5
+# 键盘事件 - 热键、组合键
+
+# ==================== 任务调度（必需） ====================
+APScheduler>=3.10.0
+# 定时任务调度引擎
+
+# ==================== 图像处理（必需） ====================
+Pillow>=10.0.0
+# 图像处理、截图、格式转换
+
+numpy>=1.24.0
+# 数值计算基础
+
+opencv-python-headless>=4.8.0
+# 计算机视觉（轻量版，无GUI依赖）
+
+# ==================== 系统监控（必需） ====================
+psutil>=5.9.0
+# 系统资源监控 - CPU/内存/进程
+
+requests>=2.31.0
+# HTTP请求
+
+# ==================== REST API 服务（可选） ====================
+# fastapi>=0.104.0
+# uvicorn>=0.24.0
+# pydantic>=2.5.0
+# 用于 daemon 模式的 Web 管理接口
+# 安装: pip install fastapi uvicorn pydantic
+
+# ==================== OCR 引擎（可选，三选一） ====================
+# 方案A - PaddleOCR（推荐，中英文最佳）
+# pip install paddlepaddle paddleocr
+# GPU版: pip install paddlepaddle-gpu paddleocr
+#
+# 方案B - Tesseract（轻量备选）
+# pip install pytesseract
+# 还需安装: https://github.com/UB-Mannheim/tesseract/wiki
+#
+# 方案C - Windows原生OCR（无需安装）
+# pip install winrt
+
+# ==================== PyInstaller 打包（可选） ====================
+# pyinstaller>=6.0.0
+# 构建exe: pip install pyinstaller && build.bat
+
+# ==================== 已移除的依赖 ====================
+# pynput     - 未使用（已用 keyboard + pyautogui替代）
+# comtypes   - 未使用
+# scipy      - 未使用（贝塞尔曲线用纯数学实现）
+# croniter   - APScheduler内置cron支持，无需单独安装

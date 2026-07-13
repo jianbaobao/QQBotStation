@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  qqbotstation:
+    build: .
+    container_name: qqbotstation
+    ports:
+      - "8580:8580"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./logs:/app/data/logs
+    environment:
+      - QQBOT_HEADLESS=1
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+    # 需要共享宿主的显示设备时（用于操控桌面QQ），取消注释以下配置
+    # network_mode: "host"
+    # volumes:
+    #   - ./data:/app/data
+    #   - ./config:/app/config
+    #   - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    # environment:
+    #   - DISPLAY=:0
