@@ -26,22 +26,27 @@ if [ -z "$PYTHON" ]; then
 fi
 echo "[OK] $($PYTHON --version)"
 
-# 检查 python3-venv（Ubuntu/Debian 需要）
+# 检查 python3-venv（Ubuntu/Debian 需要，包名含 Python 版本号）
 if ! $PYTHON -m venv --help &>/dev/null 2>&1; then
     echo "[检测] python3-venv 模块缺失，尝试安装..."
+    PY_VER=$($PYTHON -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
     if command -v apt-get &>/dev/null; then
         echo "  更新 apt 缓存..."
         sudo apt-get update -qq 2>/dev/null
-        echo "  安装 python3-venv..."
-        sudo apt-get install -y -qq --fix-missing python3-venv 2>/dev/null && echo "[OK] python3-venv 已安装" || {
-            echo "  重试: 刷新 apt 源..."
-            sudo apt-get update 2>/dev/null
-            sudo apt-get install -y --fix-missing python3-venv 2>/dev/null && echo "[OK] python3-venv 已安装" || {
-                echo "[错误] 安装 python3-venv 失败，请手动执行:"
-                echo "  sudo apt update && sudo apt install python3-venv"
-                exit 1
-            }
-        }
+        INSTALLED=0
+        for pkg in "python${PY_VER}-venv" "python3-venv"; do
+            echo "  尝试: $pkg"
+            if sudo apt-get install -y -qq --fix-missing "$pkg" 2>/dev/null; then
+                echo "[OK] $pkg 已安装"
+                INSTALLED=1
+                break
+            fi
+        done
+        if [ "$INSTALLED" = "0" ] || ! $PYTHON -m venv --help &>/dev/null 2>&1; then
+            echo "[错误] 安装失败，请手动执行:"
+            echo "  sudo apt update && sudo apt install python${PY_VER}-venv"
+            exit 1
+        fi
     elif command -v dnf &>/dev/null; then
         sudo dnf install -y python3-virtualenv 2>/dev/null || {
             echo "[错误] 请手动安装: sudo dnf install python3-virtualenv"
