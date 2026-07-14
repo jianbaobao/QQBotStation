@@ -26,6 +26,26 @@ if [ -z "$PYTHON" ]; then
 fi
 echo "[OK] $($PYTHON --version)"
 
+# 检查 python3-venv（Ubuntu/Debian 需要）
+if ! $PYTHON -m venv --help &>/dev/null 2>&1; then
+    echo "[检测] python3-venv 模块缺失，尝试安装..."
+    if command -v apt-get &>/dev/null; then
+        sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv 2>/dev/null && echo "[OK] python3-venv 已安装" || {
+            echo "[错误] 自动安装失败，请手动执行:"
+            echo "  sudo apt install python3-venv"
+            exit 1
+        }
+    elif command -v dnf &>/dev/null; then
+        sudo dnf install -y python3-virtualenv 2>/dev/null || {
+            echo "[错误] 请手动安装: sudo dnf install python3-virtualenv"
+            exit 1
+        }
+    else
+        echo "[错误] 请手动安装 python3-venv 后重试"
+        exit 1
+    fi
+fi
+
 # 虚拟环境
 if [ ! -f "venv/bin/python" ]; then
     echo "[1/4] 创建虚拟环境..."
