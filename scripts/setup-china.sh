@@ -47,18 +47,30 @@ if [ -d "$PROJECT_DIR" ] && [ -f "$PROJECT_DIR/setup.sh" ]; then
     cd "$PROJECT_DIR"
 else
     rm -rf "$PROJECT_DIR" /tmp/QQBotStation-main
-    echo "  从 ghproxy 镜像下载..."
-    wget -q --timeout=60 https://ghproxy.com/https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip -O /tmp/QQBotStation.zip 2>/dev/null || {
-        echo "  镜像1失败，尝试镜像2..."
-        wget -q --timeout=60 https://githubfast.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip -O /tmp/QQBotStation.zip 2>/dev/null || {
-            echo "  镜像2失败，尝试直连..."
-            wget -q --timeout=30 https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip -O /tmp/QQBotStation.zip 2>/dev/null || {
-                echo "[错误] 所有下载方式均失败"
-                echo "  请手动上传文件到服务器"
-                exit 1
-            }
-        }
-    }
+    echo "  尝试多个镜像下载..."
+    MIRRORS=(
+        "https://ghproxy.net/https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+        "https://ghproxy.com/https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+        "https://githubfast.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+        "https://download.fastgit.org/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+        "https://gh.api.99988866.xyz/https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+        "https://github.com/jianbaobao/QQBotStation/archive/refs/heads/main.zip"
+    )
+    DOWNLOADED=0
+    for url in "${MIRRORS[@]}"; do
+        echo "  -> $url"
+        if wget -q --timeout=30 "$url" -O /tmp/QQBotStation.zip 2>/dev/null; then
+            echo "  OK"
+            DOWNLOADED=1
+            break
+        fi
+    done
+    if [ "$DOWNLOADED" = "0" ]; then
+        echo "[错误] 所有下载方式均失败"
+        echo "  请手动执行以下命令安装依赖后上传项目:"
+        echo "  apt update && apt install python3-venv unzip wget -y"
+        exit 1
+    fi
     unzip -q /tmp/QQBotStation.zip -d /tmp/
     mv /tmp/QQBotStation-main "$PROJECT_DIR"
     rm -f /tmp/QQBotStation.zip
