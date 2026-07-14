@@ -13,8 +13,9 @@
 单例: 继承 SingletonMixin
 兼容: 同时写数据库 + JSON备份
 """
-import os
+import base64
 import json
+import os
 import threading
 import sqlite3
 from datetime import datetime
@@ -27,6 +28,23 @@ from app.utils.singleton import SingletonMixin
 
 class Database(SingletonMixin):
     """SQLite 数据库管理器 - 线程安全单例"""
+
+    @staticmethod
+    def _encrypt(val: str) -> str:
+        """简单编码密码（非加密，防明文泄露）"""
+        if not val:
+            return ''
+        return base64.b64encode(val.encode()).decode()
+
+    @staticmethod
+    def _decrypt(val: str) -> str:
+        """解码密码"""
+        if not val:
+            return ''
+        try:
+            return base64.b64decode(val.encode()).decode()
+        except Exception:
+            return val
 
     def _init_instance(self, db_path: str = None):
         if db_path is None:
@@ -266,9 +284,9 @@ class Database(SingletonMixin):
                 site.get('success_indicator', '签到成功'),
                 1 if site.get('need_login') else 0,
                 site.get('username_selector', ''),
-                site.get('password_selector', ''),
+                self._encrypt(site.get('password_selector', '')),
                 site.get('username', ''),
-                site.get('password', ''),
+                self._encrypt(site.get('password', '')),
                 site.get('login_selector', ''),
                 json.dumps(site.get('steps', []), ensure_ascii=False),
                 site.get('wait_after', 3),
@@ -288,9 +306,9 @@ class Database(SingletonMixin):
                 site.get('success_indicator', '签到成功'),
                 1 if site.get('need_login') else 0,
                 site.get('username_selector', ''),
-                site.get('password_selector', ''),
+                self._encrypt(site.get('password_selector', '')),
                 site.get('username', ''),
-                site.get('password', ''),
+                self._encrypt(site.get('password', '')),
                 site.get('login_selector', ''),
                 json.dumps(site.get('steps', []), ensure_ascii=False),
                 site.get('wait_after', 3),
@@ -317,6 +335,8 @@ class Database(SingletonMixin):
             site['need_login'] = bool(site['need_login'])
             site['steps'] = json.loads(site['steps'] or '[]')
             site['id'] = site['id']
+            site['password'] = self._decrypt(site.get('password', ''))
+            site['password_selector'] = self._decrypt(site.get('password_selector', ''))
             sites.append(site)
         return sites
 

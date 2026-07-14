@@ -101,8 +101,8 @@ class ApiServer:
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
+            allow_origins=["http://localhost:8580", "http://127.0.0.1:8580"],
+            allow_credentials=False,
             allow_methods=["*"],
             allow_headers=["*"],
         )
@@ -221,7 +221,7 @@ class ApiServer:
                 site_id = db.save_site(data)
                 return {"id": site_id, "message": f"站点「{data['name']}」已创建"}
             except Exception as e:
-                raise HTTPException(500, f"创建失败: {e}")
+                raise HTTPException(500, "创建失败: 服务器内部错误")
 
         @app.put("/api/sites/{site_id}")
         async def update_site(site_id: int, updates: SiteUpdate):
@@ -233,7 +233,7 @@ class ApiServer:
                 db.save_site(update_data)
                 return {"message": "站点已更新"}
             except Exception as e:
-                raise HTTPException(500, f"更新失败: {e}")
+                raise HTTPException(500, "更新失败: 服务器内部错误")
 
         @app.delete("/api/sites/{site_id}")
         async def delete_site(site_id: int):
@@ -243,7 +243,7 @@ class ApiServer:
                 db.delete_site(site_id)
                 return {"message": "站点已删除"}
             except Exception as e:
-                raise HTTPException(500, f"删除失败: {e}")
+                raise HTTPException(500, "删除失败: 服务器内部错误")
 
         @app.post("/api/sites/{site_id}/checkin")
         async def checkin_site(site_id: int):
@@ -275,7 +275,7 @@ class ApiServer:
             except HTTPException:
                 raise
             except Exception as e:
-                raise HTTPException(500, f"签到失败: {e}")
+                raise HTTPException(500, "签到执行失败")
 
         # ==================== QQ 消息 ====================
         @app.post("/api/qq/send")
@@ -293,7 +293,7 @@ class ApiServer:
             except HTTPException:
                 raise
             except Exception as e:
-                raise HTTPException(500, f"发送失败: {e}")
+                raise HTTPException(500, "发送失败: QQ客户端异常")
 
         @app.get("/api/qq/status")
         async def qq_status():
@@ -345,7 +345,7 @@ class ApiServer:
                     db.set_config(key, value)
                 return {"message": "配置已更新"}
             except Exception as e:
-                raise HTTPException(500, f"更新失败: {e}")
+                raise HTTPException(500, "更新失败: 服务器内部错误")
 
         return app
 
@@ -390,7 +390,7 @@ class ApiServer:
             def _json(self, data, status=200):
                 self.send_response(status)
                 self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Origin', 'http://localhost:8580')
                 self.send_header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
                 self.send_header('Access-Control-Allow-Headers', 'Content-Type')
                 self.end_headers()
@@ -450,7 +450,7 @@ class ApiServer:
                             import time; time.sleep(body.get('delay', 5))
                         self._json({"message": f"已发送到 {len(body.get('groups',[]))} 个群"})
                     except Exception as e:
-                        self._json({"error": str(e)}, 500)
+                        self._json({"error": "服务器内部错误"}, 500)
                 else:
                     self._json({"error": "not found"}, 404)
 
